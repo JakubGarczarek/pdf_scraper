@@ -3,26 +3,32 @@ import os
 import glob
 import pandas as pd
 
+def pdf_to_one_xls(year, pages):
+	file = f"bilans_{year}.pdf"
+	tables = camelot.read_pdf(file, pages)
+	tables.export(f"bilans_{year}.xls", f='xls')
+
+def pdf_to_mult_csv(year, pages):
+	file = f"bilans_{year}.pdf"
+	tables = camelot.read_pdf(file, pages, flavor='lattice')
+	nr = 0
+	while nr < tables.n:
+		if tables[nr].df.columns.stop == 7:
+			tables[nr].to_csv(f"{file}_{nr}.csv", index=False)
+		nr += 1
+
+def combine_csv(file):
+	extension = 'csv'
+	all_filenames = [i for i in glob.glob('*.{}'.format(extension))]
+	#combine all files in the list
+	combined_csv = pd.concat([pd.read_csv(f) for f in all_filenames ])
+	#export to csv
+	combined_csv.to_csv( f"{file}.csv", index=False, encoding='utf-8-sig')
+
 
 year = 2021
 
-pages = 'all'
+pdf_to_mult_csv(year,'all')
 
-file = f"bilans_{year}.pdf"
-tables = camelot.read_pdf(file, pages)
-
-# # tables.export('bilans_2021.csv', f='csv')
-
-nr = 0
-
-while nr < tables.n:
-	if tables[nr].df.columns.stop == 7:
-		tables[nr].to_csv(f"{file}_{nr}.csv", index=False)
-		nr += 1
+combine_csv(f"bilans_{year}")
 	
-extension = 'csv'
-all_filenames = [i for i in glob.glob('*.{}'.format(extension))]
-#combine all files in the list
-combined_csv = pd.concat([pd.read_csv(f) for f in all_filenames ])
-#export to csv
-combined_csv.to_csv( f"{file}.csv", index=False, encoding='utf-8-sig')
