@@ -3,18 +3,9 @@ import os
 import glob
 import pandas as pd
 
-def pdf_to_one_xls(year, pages):
-	file = f"bilans_{year}.pdf"
-	tables = camelot.read_pdf(file, pages)
-	tables.export(f"bilans_{year}.xls", f='xls')
-
 def pdf_to_mult_csv(year, pages):
-
-	if year > 2018:
-		file = f"bilans_{year}.pdf"
-	else:
-		file = f"Bilans_{year}.pdf"
-	print(file)
+	
+	file = f"bilans_{year}.pdf"
 	tables = camelot.read_pdf(file, pages, flavor='lattice')
 	nr = 0
 	while nr < tables.n:
@@ -30,7 +21,7 @@ def combine_csv(file):
 	#export to csv
 	combined_csv.to_csv( f"{file}.csv", index=False, encoding='utf-8-sig')
 
-years = [2019, 2020, 2021]
+years = [2018, 2019, 2020, 2021] 
 
 for year in years:
 	pdf_to_mult_csv(year,'all')
